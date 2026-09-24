@@ -91,3 +91,26 @@ join alunos a on a.id = mat.aluno_id
 JOIN itens_matricula im on im.matricula_id = mat.id
 join modalidades m on m.id = im.modalidade_id
 where mat.status = 'ativa'
+
+select 
+	m.nome,
+	m.capacidade_maxima,
+	p.valor_mensal_base, 
+	m.disponivel
+from modalidades m
+JOIN planos p ON p.id = m.plano_id
+where m.capacidade_maxima >= 15
+and p.valor_mensal_base >= 100.00
+and m.disponivel = TRUE
+
+create View vw_faturamento_medio_plano as
+select
+	p.nome as plano,
+	sum((im.valor_mensal_aplicado * im.duracao_meses) + im.taxa_adesao) as faturamento_total,
+	round(avg(im.duracao_meses),1) as media_meses_contratados
+from itens_matricula im
+	join matriculas mat on mat.id = im.matricula_id
+	join modalidades m on m.id = im.modalidade_id
+	join planos p on p.id = m.plano_id
+where mat.status = 'ativa'
+group by p.nome;
